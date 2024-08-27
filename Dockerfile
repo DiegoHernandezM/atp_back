@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y nginx \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
+# Copia el archivo SQL al contenedor
+COPY ./quizz.sql /docker-entrypoint-initdb.d/quizz.sql
+
 # Copia la configuración de Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
@@ -35,16 +38,12 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:cache
 RUN php artisan route:cache
 
+# Copia el script wait-for-mysql.sh al contenedor
+COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
+RUN chmod +x /usr/local/bin/wait-for-mysql.sh
+
+# Ejecutar la importación del dump SQL
+CMD ["sh", "-c", "mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
+
 # Exponer el puerto 8080
 EXPOSE 8080
-
-# Comando para iniciar Nginx junto con PHP-FPM
-CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
-
-FROM mysql:5.7
-
-# Copia el archivo dump.sql al contenedor
-COPY ./quizz.sql /docker-entrypoint-initdb.d/
-
-# Ejecuta el comando para importar la base de datos
-CMD ["bash", "-c", "mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql"]
