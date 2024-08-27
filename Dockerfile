@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install -y nginx \
 # Copia la configuración de Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
+# Instala Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # Establece el directorio de trabajo
 WORKDIR /var/www
 
@@ -35,5 +38,5 @@ RUN php artisan route:cache
 # Exponer el puerto 80
 EXPOSE 80
 
-# Iniciar Nginx y PHP-FPM
+# Comando para iniciar Nginx junto con PHP-FPM
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
