@@ -1,9 +1,8 @@
 # Usa la imagen oficial de PHP con FPM
 FROM php:8.1-fpm
 
-# Instala dependencias necesarias, incluyendo la extensión zip
-RUN apt-get update && apt-get install -y \
-    build-essential \
+# Instala Nginx y otras dependencias
+RUN apt-get update && apt-get install -y nginx \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
@@ -16,6 +15,9 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+
+# Copia la configuración de Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -33,8 +35,8 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:cache
 RUN php artisan route:cache
 
-# Establece el puerto que expone el contenedor
+# Exponer el puerto 80
 EXPOSE 80
 
-# Comando para ejecutar la aplicación Laravel
-CMD ["php-fpm"]
+# Comando para iniciar Nginx junto con PHP-FPM
+CMD service php8.1-fpm start && nginx -g "daemon off;"
