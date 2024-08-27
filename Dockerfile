@@ -1,7 +1,7 @@
 # Usa la imagen oficial de PHP con FPM
 FROM php:8.1-fpm
 
-# Instala Nginx y otras dependencias
+# Instala Nginx y otras dependencias junto con el cliente MySQL
 RUN apt-get update && apt-get install -y nginx \
     libpng-dev \
     libjpeg62-turbo-dev \
@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y nginx \
     git \
     curl \
     libzip-dev \
+    default-mysql-client \  # Esto instala el cliente MySQL
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
@@ -42,9 +43,8 @@ RUN php artisan route:cache
 COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
 RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
-# Ejecutar la importación del dump SQL después de verificar que MySQL está listo
-CMD ["sh", "-c", "echo 'Checking MySQL connection...' && /usr/local/bin/wait-for-mysql.sh db && echo 'MySQL is up, proceeding with import and startup...' && mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
-
+# Ejecutar la importación del dump SQL
+CMD ["sh", "-c", "/usr/local/bin/wait-for-mysql.sh db && mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
 
 # Exponer el puerto 8080
 EXPOSE 8080
