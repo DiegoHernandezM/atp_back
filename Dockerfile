@@ -42,8 +42,9 @@ RUN php artisan route:cache
 COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
 RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
-# Ejecutar la importación del dump SQL
-CMD ["sh", "-c", "mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
+# Ejecutar la importación del dump SQL después de verificar que MySQL está listo
+CMD ["sh", "-c", "echo 'Checking MySQL connection...' && /usr/local/bin/wait-for-mysql.sh db && echo 'MySQL is up, proceeding with import and startup...' && mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
+
 
 # Exponer el puerto 8080
 EXPOSE 8080
