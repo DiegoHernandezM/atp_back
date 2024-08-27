@@ -40,3 +40,11 @@ EXPOSE 8080
 
 # Comando para iniciar Nginx junto con PHP-FPM
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+
+FROM mysql:5.7
+
+# Copia el archivo dump.sql al contenedor
+COPY ./quizz.sql /docker-entrypoint-initdb.d/
+
+# Ejecuta el comando para importar la base de datos
+CMD ["bash", "-c", "mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql"]

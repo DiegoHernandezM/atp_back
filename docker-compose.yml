@@ -28,6 +28,8 @@ services:
       MYSQL_ROOT_PASSWORD: secret
     volumes:
       - dbdata:/var/lib/mysql
+      - ./import_db.sh:/docker-entrypoint-initdb.d/import_db.sh
+      - ./quizz.sql:/docker-entrypoint-initdb.d/quizz.sql
     networks:
       - laravel
 
