@@ -12,7 +12,7 @@ services:
       - ./vendor:/var/www/vendor
       - ./storage:/var/www/storage
     ports:
-      - "8000:80"
+      - "8080:80"
     networks:
       - laravel
 
@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_DATABASE: quizz
       MYSQL_ROOT_PASSWORD: secret

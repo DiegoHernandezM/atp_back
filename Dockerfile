@@ -1,7 +1,7 @@
 # Usa la imagen oficial de PHP con FPM
-FROM php:8.2-fpm
+FROM php:8.1-fpm
 
-# Instala dependencias necesarias
+# Instala dependencias necesarias, incluyendo la extensión zip
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -13,8 +13,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
