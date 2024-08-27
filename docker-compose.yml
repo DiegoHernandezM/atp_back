@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     build:
@@ -20,9 +22,6 @@ services:
     image: mysql:5.7
     container_name: laravel_db
     restart: unless-stopped
-    tty: true
-    ports:
-      - "3307:3306"
     environment:
       MYSQL_DATABASE: quizz
       MYSQL_ROOT_PASSWORD: secret
@@ -31,3 +30,6 @@ services:
       - ./quizz.sql:/docker-entrypoint-initdb.d/quizz.sql
     networks:
       - laravel
+
+networks:
+  laravel:

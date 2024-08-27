@@ -1,4 +1,5 @@
 #!/bin/bash
+# wait-for-mysql.sh
 
 set -e
 
