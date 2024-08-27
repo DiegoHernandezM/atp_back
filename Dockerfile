@@ -35,8 +35,8 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:cache
 RUN php artisan route:cache
 
-# Exponer el puerto 80
-EXPOSE 80
+# Exponer el puerto 8080
+EXPOSE 8080
 
 # Comando para iniciar Nginx junto con PHP-FPM
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]

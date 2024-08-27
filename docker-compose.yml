@@ -12,7 +12,7 @@ services:
       - ./vendor:/var/www/vendor
       - ./storage:/var/www/storage
     ports:
-      - "8000:80"
+      - "8080:80"
     networks:
       - laravel
 
