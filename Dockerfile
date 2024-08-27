@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install -y nginx \
     git \
     curl \
     libzip-dev \
-    default-mysql-client \  # Esto instala el cliente MySQL
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+    default-mysql-client && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Copia el archivo SQL al contenedor
 COPY ./quizz.sql /docker-entrypoint-initdb.d/quizz.sql
