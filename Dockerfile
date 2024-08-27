@@ -27,7 +27,7 @@ WORKDIR /var/www
 COPY . .
 
 # Instala las dependencias de PHP con Composer
-RUN composer install --no-scripts --no-autoloader
+RUN composer install --no-dev --optimize-autoloader
 
 # Crea enlaces simbólicos, cache y otros ajustes de Laravel
 RUN php artisan config:cache
