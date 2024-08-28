@@ -47,7 +47,6 @@ RUN composer install --no-dev --optimize-autoloader
 # Crea enlaces simbólicos, cache y otros ajustes de Laravel
 RUN php artisan config:cache
 RUN php artisan route:cache
-RUN php artisan migrate --force
 
 # Configurar Nginx para que escuche en el puerto proporcionado por Render
 RUN sed -i "s/listen 80;/listen ${PORT:-80};/" /etc/nginx/nginx.conf
