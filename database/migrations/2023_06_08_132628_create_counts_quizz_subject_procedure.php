@@ -16,13 +16,13 @@ class CreateCountsQuizzSubjectProcedure extends Migration
         $procedure = "
         DO $$
         BEGIN
-            -- Elimina el procedimiento si ya existe
+            -- Elimina la función si ya existe
             IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'quizz_subject_procedure') THEN
                 DROP FUNCTION quizz_subject_procedure(INTEGER);
             END IF;
         END $$;
 
-        CREATE OR REPLACE FUNCTION quizz_subject_procedure(USER INTEGER)
+        CREATE OR REPLACE FUNCTION quizz_subject_procedure(user_id INTEGER)
         RETURNS TABLE(id INTEGER, name VARCHAR, repeticion INTEGER)
         LANGUAGE plpgsql
         AS $$
@@ -34,7 +34,7 @@ class CreateCountsQuizzSubjectProcedure extends Migration
                 SELECT ut.subject_id, COUNT(subject_id) as rep
                 FROM user_tests ut
                 RIGHT JOIN subjects s ON ut.subject_id = s.id
-                WHERE completed = 1 AND user_id = USER
+                WHERE completed = 1 AND user_id = user_id
                 GROUP BY subject_id
             ) as t2
             ON t1.id = t2.subject_id;
@@ -49,7 +49,7 @@ class CreateCountsQuizzSubjectProcedure extends Migration
         $procedure = "
         DO $$
         BEGIN
-            -- Elimina el procedimiento si existe
+            -- Elimina la función si ya existe
             IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'quizz_subject_procedure') THEN
                 DROP FUNCTION quizz_subject_procedure(INTEGER);
             END IF;
