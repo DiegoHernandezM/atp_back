@@ -9,6 +9,7 @@ done
 
 # Ejecutar las migraciones de Laravel
 php artisan migrate --force
-
+php artisan db:seed --class=LandingPageSeeder
+php artisan db:seed --class=UserSeeder
 # Inicia Nginx y PHP-FPM
 php-fpm -D && nginx -g 'daemon off;'
