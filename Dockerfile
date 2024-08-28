@@ -42,7 +42,7 @@ ENV RUN_SCRIPTS 1
 ENV REAL_IP_HEADER 1
 
 # Instala las dependencias de PHP con Composer
-RUN composer install --no-dev --working-dir=/var/www/html
+RUN composer install --no-dev --optimize-autoloader
 
 # Crea enlaces simbólicos, cache y otros ajustes de Laravel
 RUN php artisan config:cache
