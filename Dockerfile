@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y nginx \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    libpq-dev \  # Añadido para PostgreSQL
+    libpq-dev \
     zip \
     unzip \
     git \
