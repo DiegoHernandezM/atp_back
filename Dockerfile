@@ -1,7 +1,7 @@
 # Usa la imagen oficial de PHP con FPM
 FROM php:8.2-fpm
 
-# Instala Nginx y otras dependencias junto con el cliente MySQL
+# Instala Nginx y otras dependencias
 RUN apt-get update && apt-get install -y nginx \
     libpng-dev \
     libjpeg62-turbo-dev \
@@ -13,12 +13,8 @@ RUN apt-get update && apt-get install -y nginx \
     git \
     curl \
     libzip-dev \
-    default-mysql-client && \
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
-
-# Copia el archivo SQL al contenedor
-COPY ./quizz.sql /docker-entrypoint-initdb.d/quizz.sql
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Copia la configuración de Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -39,13 +35,8 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:cache
 RUN php artisan route:cache
 
-# Copia el script wait-for-mysql.sh al contenedor
-COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
-RUN chmod +x /usr/local/bin/wait-for-mysql.sh
-
-# Ejecutar la importación del dump SQL
-# CMD ["sh", "-c", "/usr/local/bin/wait-for-mysql.sh db && mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
-CMD ["/usr/local/bin/wait-for-mysql.sh", "db", "php-fpm", "-D", "&&", "nginx", "-g", "daemon off;"]
-
 # Exponer el puerto 8080
 EXPOSE 8080
+
+# Inicia Nginx y PHP-FPM
+CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]

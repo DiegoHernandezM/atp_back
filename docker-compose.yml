@@ -13,21 +13,6 @@ services:
       - ./storage:/var/www/storage
     ports:
       - "8080:80"
-    depends_on:
-      - db
-    networks:
-      - laravel
-
-  db:
-    image: mysql:5.7
-    container_name: laravel_db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: quizz
-      MYSQL_ROOT_PASSWORD: secret
-    volumes:
-      - dbdata:/var/lib/mysql
-      - ./quizz.sql:/docker-entrypoint-initdb.d/quizz.sql
     networks:
       - laravel
 
