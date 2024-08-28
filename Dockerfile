@@ -44,7 +44,8 @@ COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
 RUN chmod +x /usr/local/bin/wait-for-mysql.sh
 
 # Ejecutar la importación del dump SQL
-CMD ["sh", "-c", "/usr/local/bin/wait-for-mysql.sh db && mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
+# CMD ["sh", "-c", "/usr/local/bin/wait-for-mysql.sh db && mysql -h db -u root -psecret quizz < /docker-entrypoint-initdb.d/quizz.sql && php-fpm -D && nginx -g 'daemon off;'"]
+CMD ["/usr/local/bin/wait-for-mysql.sh", "db", "php-fpm", "-D", "&&", "nginx", "-g", "daemon off;"]
 
 # Exponer el puerto 8080
 EXPOSE 8080
