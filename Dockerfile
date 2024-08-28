@@ -33,6 +33,9 @@ WORKDIR /var/www/html
 # Copia el código de la aplicación al contenedor
 COPY . .
 
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
 # Copia el script init.sh al contenedor
 COPY init.sh /usr/local/bin/init.sh
 RUN chmod +x /usr/local/bin/init.sh
