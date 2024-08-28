@@ -1,7 +1,7 @@
 # Usa la imagen oficial de PHP con FPM
 FROM php:8.2-fpm
 
-# Actualiza los repositorios e instala Nginx, dependencias de PHP, y libpq-dev para PostgreSQL
+# Instala Nginx y otras dependencias junto con el cliente PostgreSQL
 RUN apt-get update && apt-get install -y nginx \
     libpng-dev \
     libjpeg62-turbo-dev \
@@ -40,8 +40,11 @@ RUN composer install --no-dev --optimize-autoloader
 RUN php artisan config:cache
 RUN php artisan route:cache
 
-# Exponer el puerto 8080
-EXPOSE 8080
+# Configurar Nginx para que escuche en el puerto proporcionado por Render
+RUN sed -i "s/listen 80;/listen ${PORT:-8080};/" /etc/nginx/nginx.conf
+
+# Exponer el puerto (opcional, ya que Render asigna uno automáticamente)
+EXPOSE ${PORT:-8080}
 
 # Inicia Nginx y PHP-FPM
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
