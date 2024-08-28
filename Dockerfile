@@ -1,8 +1,11 @@
 # Usa la imagen oficial de PHP con FPM
 FROM php:8.2-fpm
 
-# Instala Nginx y otras dependencias
-RUN apt-get update && apt-get install -y nginx \
+# Actualiza los repositorios y instala Nginx
+RUN apt-get update && apt-get install -y nginx
+
+# Instala dependencias necesarias para PHP
+RUN apt-get install -y \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
@@ -12,9 +15,13 @@ RUN apt-get update && apt-get install -y nginx \
     unzip \
     git \
     curl \
-    libzip-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
+    libzip-dev
+
+# Configura las extensiones GD para PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+
+# Instala las extensiones de PHP
+RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Copia la configuración de Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
