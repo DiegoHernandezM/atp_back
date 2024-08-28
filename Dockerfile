@@ -33,18 +33,27 @@ WORKDIR /var/www
 # Copia el código de la aplicación al contenedor
 COPY . .
 
+ENV APP_ENV production
+ENV APP_DEBUG false
+ENV LOG_CHANNEL stderr
+ENV WEBROOT /var/www/html/public
+ENV PHP_ERRORS_STDERR 1
+ENV RUN_SCRIPTS 1
+ENV REAL_IP_HEADER 1
+
 # Instala las dependencias de PHP con Composer
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --working-dir=/var/www/html
 
 # Crea enlaces simbólicos, cache y otros ajustes de Laravel
 RUN php artisan config:cache
 RUN php artisan route:cache
+RUN php artisan migrate --force
 
 # Configurar Nginx para que escuche en el puerto proporcionado por Render
-RUN sed -i "s/listen 80;/listen ${PORT:-8080};/" /etc/nginx/nginx.conf
+RUN sed -i "s/listen 80;/listen ${PORT:-80};/" /etc/nginx/nginx.conf
 
 # Exponer el puerto (opcional, ya que Render asigna uno automáticamente)
-EXPOSE ${PORT:-8080}
+EXPOSE ${PORT:-80}
 
 # Inicia Nginx y PHP-FPM
 CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
