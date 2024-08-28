@@ -13,13 +13,9 @@ RUN apt-get update && apt-get install -y nginx \
     zip \
     unzip \
     git \
-    curl
-
-# Configura las extensiones GD para PHP
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-
-# Instala las extensiones de PHP, incluyendo pdo_pgsql para PostgreSQL
-RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
+    curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Copia la configuración de Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -28,25 +24,23 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Establece el directorio de trabajo
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # Copia el código de la aplicación al contenedor
 COPY . .
 
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
-
 # Instala las dependencias de PHP con Composer
 RUN composer install --no-dev --optimize-autoloader
+
+# Test de conexión a la base de datos PostgreSQL
+RUN php -r "try { new PDO('pgsql:host=${DB_HOST};port=${DB_PORT};dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}'); echo 'Connected to PostgreSQL database successfully.'; } catch (PDOException $e) { echo 'Connection failed: ' . $e->getMessage(); exit(1); }"
 
 # Crea enlaces simbólicos, cache y otros ajustes de Laravel
 RUN php artisan config:cache
 RUN php artisan route:cache
+
+# Ejecutar migraciones (asegúrate de que la base de datos esté accesible)
+RUN php artisan migrate --force
 
 # Configurar Nginx para que escuche en el puerto proporcionado por Render
 RUN sed -i "s/listen 80;/listen ${PORT:-80};/" /etc/nginx/nginx.conf
